@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 import User from "../models/user.ts";
-import { token } from "morgan";
 import { generateToken } from "../utils/generateToken.ts";
+import { logActivity } from "../utils/activitieslog.ts";
 //import { generateToken } from "../utils/generateToken.ts";
 //import { logActivity } from "../utils/activitieslog.ts";
 //import type { AuthRequest } from "../middleware/auth.ts";
@@ -41,6 +41,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (newUser) {
+      if ((req as any).user) {
+        await logActivity({
+          userId: (req as any).user._id,
+          action: "Registered User",
+          details: `Registered user with email: ${newUser.email}`,
+        });
+      }
       res.status(201).json({
         _id: newUser._id,
         name: newUser.name,
@@ -60,7 +67,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 //@desc Auth user & get token
-// @route POST /api/users/login
+//@route POST /api/users/login
 //@access Public
 
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -68,9 +75,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
-    //check is user exists and password matches
+    // check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
-      //generate token
+      // generate token
       generateToken(user.id.toString(), res);
       res.json(user);
     } else {
