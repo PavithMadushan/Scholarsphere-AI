@@ -87,3 +87,38 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+//@desc Update user (Admin)
+//@route PUT /api/users/:id
+//@access Private/Admin
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.role = req.body.role || user.role;
+      user.isActive =
+        req.body.isActive !== undefined ? req.body.isActive : user.isActive;
+      user.studentClass = req.body.studentClass || user.studentClass;
+      user.teacherSubject = req.body.teacherSubject || user.teacherSubject;
+
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+      const updatedUser = await user.save();
+
+      if ((req as any).user) {
+        await logActivity({
+          userId: (req as any).user._id,
+          action: "Updated User",
+          details: `Updated user with email: ${updatedUser.email}`,
+        });
+      }
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
