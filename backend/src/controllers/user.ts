@@ -135,3 +135,29 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+// @desc    Delete user (Admin)
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      await user.deleteOne();
+      if ((req as any).user) {
+        // here we passing userId as objectId instead of string
+        // we also have other problem
+        await logActivity({
+          userId: (req as any).user._id.toString(),
+          action: "Deleted User",
+          details: `Deleted user with email: ${user.email}`,
+        });
+      }
+      res.json({ message: "User deleted successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
