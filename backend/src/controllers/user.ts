@@ -88,9 +88,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-//@desc Update user (Admin)
-//@route PUT /api/users/:id
-//@access Private/Admin
+// @desc    Update user (Admin)
+// @route   PUT /api/users/:id
+// @access  Private/Admin
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.params.id);
@@ -102,19 +102,32 @@ export const updateUser = async (req: Request, res: Response) => {
         req.body.isActive !== undefined ? req.body.isActive : user.isActive;
       user.studentClass = req.body.studentClass || user.studentClass;
       user.teacherSubject = req.body.teacherSubject || user.teacherSubject;
-
       if (req.body.password) {
         user.password = req.body.password;
       }
       const updatedUser = await user.save();
-
+      // up to here it's working
       if ((req as any).user) {
+        // here we passing userId as objectId instead of string
+        // we also have other problem
         await logActivity({
-          userId: (req as any).user._id,
+          userId: (req as any).user._id.toString(),
           action: "Updated User",
           details: `Updated user with email: ${updatedUser.email}`,
         });
       }
+      // we are not returning something here (res.json) so the client is waiting forever
+      // sorry about that!
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        isActive: updatedUser.isActive,
+        studentClass: updatedUser.studentClass,
+        teacherSubject: updatedUser.teacherSubject,
+        message: "User updated successfully",
+      });
     } else {
       res.status(404).json({ message: "User not found" });
     }
