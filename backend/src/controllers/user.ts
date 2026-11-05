@@ -2,6 +2,7 @@ import { type Request, type Response } from "express";
 import User from "../models/user.ts";
 import { generateToken } from "../utils/generateToken.ts";
 import { logActivity } from "../utils/activitieslog.ts";
+import type { AuthRequest } from "../middleware/auth.ts";
 //import { generateToken } from "../utils/generateToken.ts";
 //import { logActivity } from "../utils/activitieslog.ts";
 //import type { AuthRequest } from "../middleware/auth.ts";
@@ -157,6 +158,44 @@ export const deleteUser = async (req: Request, res: Response) => {
     } else {
       res.status(404).json({ message: "User not found" });
     }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+// @desc Get user profile (via cookie)
+// @route GET /ap[i/users/profile
+// @access Private
+export const getUserProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user) {
+      res.json({
+        user: {
+          _id: req.user._id,
+          name: req.user.name,
+          email: req.user.email,
+          role: req.user.role,
+        },
+      });
+    } else {
+      res.status(401).json({ message: "Not authorized" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+// @desc Logout user/ clear cookie
+// @route POST /api/users/logout
+// @access Public
+
+export const logoutUser = async (req: Request, res: Response) => {
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      expires: new Date(0), //expire the cookie immediately
+    });
+    res.json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
