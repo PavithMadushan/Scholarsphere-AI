@@ -137,3 +137,42 @@ export const deleteAcademicYear = async (
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+// @desc Get all academic years (Paginated and Searchable)
+// @route GET /api/academic-years
+// @access Private/Admin
+
+export const getAllAcademicYears = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
+
+    // Build Search Query (Search by Name)
+    const query: any = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    const [total, years] = await Promise.all([
+      AcademicYear.countDocuments(query),
+      AcademicYear.find(query)
+        .sort({ createdAt: -1 }) // Newest first
+        .skip((page - 1) * limit)
+        .limit(limit),
+    ]);
+
+    res.json({
+      years,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};

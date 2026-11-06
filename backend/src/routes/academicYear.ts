@@ -1,8 +1,12 @@
-import { createAcademicYear, deleteAcademicYear, getCurrentAcademicYear, updateAcademicYear } from './../controllers/academicYear';
+import { createAcademicYear, deleteAcademicYear, getAllAcademicYears, getCurrentAcademicYear, updateAcademicYear } from './../controllers/academicYear';
 import express from 'express';
 import { authorize, protect } from '../middleware/auth';
 
 const academicYearRouter = express.Router();
+
+academicYearRouter
+  .route("/")
+  .get(protect, authorize(["admin"]), getAllAcademicYears);
 
 academicYearRouter
   .route("/create")
