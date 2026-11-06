@@ -100,3 +100,40 @@ export const updateAcademicYear = async (
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+// @desc Delete Academic Year
+// @route DELETE /api/academic-years/:id
+// @access Private/Admin
+
+export const deleteAcademicYear = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const year = await AcademicYear.findById(req.params.id);
+
+    if (!year) {
+      res.status(404).json({ message: "Academic Year not found" });
+      return;
+    }
+    if (year) {
+      //Prevent deletion if it's the current academic year to avoid system breakage
+      if (year.isCurrent) {
+        res
+          .status(400)
+          .json({ message: "Cannot delete the current academic year" });
+        return;
+      }
+    }
+    await year.deleteOne();
+
+    await logActivity({
+      userId: (req as any).user._id,
+      action: `Deleted academic year ${year.name}`,
+    });
+
+    res.status(200).json({ message: "Academic Year deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};

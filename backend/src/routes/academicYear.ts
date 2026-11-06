@@ -1,4 +1,4 @@
-import { createAcademicYear, getCurrentAcademicYear, updateAcademicYear } from './../controllers/academicYear';
+import { createAcademicYear, deleteAcademicYear, getCurrentAcademicYear, updateAcademicYear } from './../controllers/academicYear';
 import express from 'express';
 import { authorize, protect } from '../middleware/auth';
 
@@ -15,5 +15,9 @@ academicYearRouter
 academicYearRouter
   .route("/update/:id")
   .patch(protect, authorize(["admin"]), updateAcademicYear);  
+
+academicYearRouter
+  .route("/delete/:id")
+  .delete(protect, authorize(["admin"]), deleteAcademicYear);  
 
 export default academicYearRouter;
