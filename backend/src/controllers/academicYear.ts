@@ -7,7 +7,7 @@ import { logActivity } from "../utils/activitieslog";
 // @access  Private/Admin
 export const createAcademicYear = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { name, fromYear, toYear, isCurrent } = req.body;
@@ -22,7 +22,7 @@ export const createAcademicYear = async (
       // the issue is here
       await AcademicYear.updateMany(
         { _id: { $ne: null } },
-        { isCurrent: false }
+        { isCurrent: false },
       );
       // we should no use return since we want the function to continue
     }
@@ -39,5 +39,26 @@ export const createAcademicYear = async (
     res.status(201).json(academicYear);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+// @desc Get the current active Academic Year
+// @routr GET /api/academic-yearrs/current
+// @access Public or Protected
+
+export const getCurrentAcademicYear = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const currentYear = await AcademicYear.findOne({ isCurrent: true });
+    if (!currentYear) {
+      res.status(404).json({ message: "No current academic year found" });
+      return;
+    } else {
+      res.status(200).json(currentYear);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
   }
 };
