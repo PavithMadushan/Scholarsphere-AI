@@ -62,3 +62,41 @@ export const getCurrentAcademicYear = async (
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+// @desc Update Academic Year
+// @route PUT /api/academic-years/:id
+// @access Private/Admin
+
+export const updateAcademicYear = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { isCurrent } = req.body;
+    if (isCurrent) {
+      await AcademicYear.updateMany(
+        { _id: { $ne: req.params.id } },
+        { isCurrent: false },
+      );
+    }
+
+    const updatedYear = await AcademicYear.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }, // Return the updated version
+    );
+
+    if (!updatedYear) {
+      res.status(404).json({ message: "Academic Year not found" });
+    }
+
+    await logActivity({
+      userId: (req as any).user._id,
+      action: `Created academic year ${updatedYear?.name}`,
+    });
+
+    res.status(200).json(updatedYear);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
