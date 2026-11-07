@@ -84,3 +84,44 @@ export const deleteClass = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get All Classes
+// @route   GET /api/classes
+// @access  Private
+export const getAllClasses = async (req: Request, res: Response) => {
+  try {
+    // 1. Parse Query Parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
+
+    // 2. Build Search Query (Case-insensitive regex on Name)
+    const query: any = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    // 3. Execute Query (Count & Find)
+    const [total, classes] = await Promise.all([
+      Class.countDocuments(query),
+      Class.find(query)
+        .populate("academicYear", "name")
+        .populate("classTeacher", "name email")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+    ]);
+
+    // 4. Return Data + Pagination Meta
+    res.json({
+      classes,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
