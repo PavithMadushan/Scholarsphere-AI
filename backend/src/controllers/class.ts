@@ -64,3 +64,23 @@ export const updateClass = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+// @desc    Delete Class
+// @route   DELETE /api/classes/:id
+// @access  Private/Admin
+export const deleteClass = async (req: Request, res: Response) => {
+  try {
+    const deletedClass = await Class.findByIdAndDelete(req.params.id);
+    const userId = (req as any).user._id;
+    await logActivity({
+      userId,
+      action: `Deleted class: ${deletedClass?.name}`,
+    });
+    if (!deletedClass) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    res.json({ message: "Class removed" });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
