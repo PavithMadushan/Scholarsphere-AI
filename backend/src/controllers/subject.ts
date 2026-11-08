@@ -106,3 +106,23 @@ export const updateSubject = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+// @desc    Delete Subject
+// @route   DELETE /api/subjects/:id
+// @access  Private/Admin
+export const deleteSubject = async (req: Request, res: Response) => {
+  try {
+    const deletedSubject = await subject.findByIdAndDelete(req.params.id);
+    if (!deletedSubject) {
+      return res.status(404).json({ message: "Subject not found" });
+    }
+    const userId = (req as any).user._id;
+    await logActivity({
+      userId,
+      action: `Updated subject: ${deletedSubject?.name}`,
+    });
+    res.json({ message: "Subject deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
