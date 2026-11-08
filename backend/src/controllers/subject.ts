@@ -30,3 +30,47 @@ export const createSubject = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
+// @desc Get all Subjects
+// @route GET/api/subjects
+// @access Private/Admin
+
+export const getAllSubjects = async (req: Request, res: Response) => {
+  try {
+    // 1. Parse Query Parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
+
+    // 2. Build Search Query (Search by Name OR Code)
+    const query: any = {};
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { code: { $regex: search, $options: "i" } },
+      ];
+    }
+    // 3. Execute Query (Count & Find)
+    const [total, subjects] = await Promise.all([
+      subject.countDocuments(query),
+      subject
+        .find(query)
+        .populate("teacher", "name email")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+    ]);
+    // 4. Return Data + Pagination Meta
+    res.json({
+      subjects,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
