@@ -1,6 +1,6 @@
 import express from "express";
 import { authorize, protect } from "../middleware/auth";
-import { createSubject, getAllSubjects } from "../controllers/subject";
+import { createSubject, getAllSubjects, updateSubject } from "../controllers/subject";
 
 const subjectRouter = express.Router();
 
@@ -11,5 +11,9 @@ subjectRouter
 subjectRouter
   .route("/")
   .get(protect, authorize(["admin", "teacher"]), getAllSubjects);
+
+subjectRouter
+  .route("/update/:id")
+  .patch(protect, authorize(["admin"]), updateSubject);
 
 export default subjectRouter;
