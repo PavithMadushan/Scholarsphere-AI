@@ -14,6 +14,9 @@ import LogsRouter from "./routes/activitieslog";
 import academicYearRouter from "./routes/academicYear";
 import classRouter from "./routes/class";
 import subjectRouter from "./routes/subject";
+import {serve} from "inngest/express";
+import { inngest } from "./inngest";
+import {generateTimeTable} from "./inngest/functions";
 
 dotenv.config();
 
@@ -25,6 +28,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
+app.use(
+  "/api/inngest",
+  serve({
+    client: inngest,
+    functions: [generateTimeTable],
+  }),
+);
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
