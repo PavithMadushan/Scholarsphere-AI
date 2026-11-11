@@ -90,7 +90,7 @@ export const updateSubject = async (req: Request, res: Response) => {
         isActive,
         teacher: Array.isArray(teacher) ? teacher : [],
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     const userId = (req as any).user._id;
     await logActivity({

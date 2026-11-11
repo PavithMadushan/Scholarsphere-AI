@@ -2,14 +2,21 @@ import { inngest } from "./index";
 
 export const generateTimeTable = inngest.createFunction(
   {
-    id: "process-task",
-    triggers: [{ event: "test/hello.world" }],
+    id: "Generate-Timetable",
+    triggers: [
+      {
+        event: "generate/timetable",
+      },
+    ],
   },
   async ({ event, step }) => {
-    await step.sleep("wait-a-moment", "1s");
+    const { classId, academicYearId, settings } = event.data;
+    // await step.sleep("wait-a-moment", "1s");
 
     return {
-      message: `Hello ${event.data.email}!`,
+      classId,
+      academicYearId,
+      settings,
     };
   },
 );
