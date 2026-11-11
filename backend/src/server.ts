@@ -68,6 +68,6 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
 
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log("Server is running on PORT 3000");
+    console.log("Server is running on PORT 5000");
   });
 });
