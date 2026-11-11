@@ -1,5 +1,5 @@
 import { Inngest } from "inngest";
 
-export const inngest = new Inngest({ id: "sms-lms" });
-
-export const functions = [];
+export const inngest = new Inngest({
+  id: "sms-lms",
+});
