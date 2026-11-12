@@ -1,3 +1,4 @@
+
 import { inngest } from "./index";
 
 export const generateTimeTable = inngest.createFunction(
@@ -10,8 +11,21 @@ export const generateTimeTable = inngest.createFunction(
     ],
   },
   async ({ event, step }) => {
+
+    // Diagnostic: inspect the event received by Inngest
+    console.log(
+      "Received Inngest Event:",
+      JSON.stringify(event, null, 2)
+    );
+
+    // Check whether event data exists
+    if (!event || !event.data) {
+      throw new Error(
+        "Inngest received an event without a data object."
+      );
+    }
+
     const { classId, academicYearId, settings } = event.data;
-    // await step.sleep("wait-a-moment", "1s");
 
     return {
       classId,
