@@ -16,8 +16,9 @@ import classRouter from "./routes/class";
 import subjectRouter from "./routes/subject";
 import { serve } from "inngest/express";
 import { inngest } from "./inngest";
-import { generateTimeTable } from "./inngest/functions";
+import { generateExam, generateTimeTable } from "./inngest/functions";
 import timeRouter from "./routes/timetable";
+import examRouter from "./routes/exam";
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ app.use(
   "/api/inngest",
   serve({
     client: inngest,
-    functions: [generateTimeTable],
+    functions: [generateTimeTable, generateExam],
   }),
 );
 
@@ -61,6 +62,7 @@ app.use("/api/academic-year", academicYearRouter);
 app.use("/api/classes", classRouter);
 app.use("/api/subjects", subjectRouter);
 app.use("/api/timetables", timeRouter);
+app.use("/api/exams", examRouter);
 
 //global error handler middleware
 app.use((err: Error, req: Request, res: Response, next: Function) => {

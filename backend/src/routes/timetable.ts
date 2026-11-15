@@ -1,5 +1,5 @@
 import express from "express";
-import { generateTimeTable } from "../controllers/timetable.ts";
+import { generateTimetable, getTimetable } from "../controllers/timetable.ts";
 import { protect, authorize } from "../middleware/auth.ts";
 
 const timeRouter = express.Router();
@@ -8,6 +8,6 @@ const timeRouter = express.Router();
 timeRouter.post("/generate", protect, authorize(["admin"]), generateTimeTable);
 
 // View: Everyone (Students need to see their schedule)
-// timeRouter.get("/:classId", protect, getTimetable);
+timeRouter.get("/:classId", protect, getTimetable);
 
 export default timeRouter;
