@@ -5,7 +5,7 @@ import { protect, authorize } from "../middleware/auth.ts";
 const timeRouter = express.Router();
 
 // Generate: Admin only (costs money/resources)
-timeRouter.post("/generate", protect, authorize(["admin"]), generateTimeTable);
+timeRouter.post("/generate", protect, authorize(["admin"]), generateTimetable);
 
 // View: Everyone (Students need to see their schedule)
 timeRouter.get("/:classId", protect, getTimetable);
