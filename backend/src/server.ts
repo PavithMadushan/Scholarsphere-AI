@@ -19,6 +19,7 @@ import { inngest } from "./inngest";
 import { generateExam, generateTimeTable } from "./inngest/functions";
 import timeRouter from "./routes/timetable";
 import examRouter from "./routes/exam";
+import dashboardRouter from "./routes/dashboard";
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.use("/api/classes", classRouter);
 app.use("/api/subjects", subjectRouter);
 app.use("/api/timetables", timeRouter);
 app.use("/api/exams", examRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 //global error handler middleware
 app.use((err: Error, req: Request, res: Response, next: Function) => {
